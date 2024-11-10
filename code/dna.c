@@ -92,7 +92,7 @@ void createCheckpoints(FMIndex *fm_index) {
 
     #pragma HLS ARRAY_PARTITION variable=tally complete
     createCheckpoints_label2:
-    for (int i = 1; i <= fm_index->text_length; i++) {
+    for (int i = 1; i <=fm_index->text_length; i++) {
         tally[(unsigned char)fm_index->bwt[i-1]]++;
 
         if (i % 1 == 0) {  // CP_INTERVAL = 1
@@ -143,6 +143,9 @@ void findRange(FMIndex *fm_index, char *pattern, int *l, int *r) {
         int y = fm_index->checkpoints[c][*r / 1];
         *l = fm_index->first[c] + (x ? x  : 0);
         *r = fm_index->first[c] + (y ? y  : 0);
+        // Print the values
+        printf("Value of *l: %d\n", *l);
+        printf("Value of *r: %d\n", *r);
         if (*r < *l) break;
 
         #pragma HLS PIPELINE
