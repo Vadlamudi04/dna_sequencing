@@ -92,8 +92,8 @@ void createCheckpoints(FMIndex *fm_index) {
 
     #pragma HLS ARRAY_PARTITION variable=tally complete
     createCheckpoints_label2:
-    for (int i = 0; i < fm_index->text_length; i++) {
-        tally[(unsigned char)fm_index->bwt[i]]++;
+    for (int i = 1; i <= fm_index->text_length; i++) {
+        tally[(unsigned char)fm_index->bwt[i-1]]++;
 
         if (i % 1 == 0) {  // CP_INTERVAL = 1
             for (int j = 0; j < ALPHABET_SIZE; j++) {
@@ -141,8 +141,8 @@ void findRange(FMIndex *fm_index, char *pattern, int *l, int *r) {
         unsigned char c = pattern[i];
         int x = fm_index->checkpoints[c][*l / 1];
         int y = fm_index->checkpoints[c][*r / 1];
-        *l = fm_index->first[c] + (x ? x - 1 : 0);
-        *r = fm_index->first[c] + (y ? y - 1 : 0);
+        *l = fm_index->first[c] + (x ? x  : 0);
+        *r = fm_index->first[c] + (y ? y  : 0);
         if (*r < *l) break;
 
         #pragma HLS PIPELINE
@@ -165,11 +165,11 @@ int createFmIndex(FMIndex *fm_index, char *text, char *pattern, int positions[],
         return 0;  // No occurrences found
     }
 
-    int occurrences = r - l + 1;  // Calculate the number of occurrences
+    int occurrences = r - l ;  // Calculate the number of occurrences
     printf("Pattern found at positions: ");
     int count = 0;
 
-    for (int i = l; i <= r && count < max_positions; i++) {
+    for (int i = l; i < r && count < max_positions; i++) {
         positions[count++] = fm_index->suffix_array[i];
         printf("%d ", fm_index->suffix_array[i]);
     }
