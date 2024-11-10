@@ -88,8 +88,8 @@ int topfunction(char *dna_seq, char *pattern, int positions[])
     int tally[ALPHABET_SIZE] = {0};
     int checkpoints[ALPHABET_SIZE][MAX_LENGTH/ 1 + 1];
 //    #pragma HLS ARRAY_PARTITION variable=tally complete
-    for (int a = 0; a < length; a++) {
-        tally[(unsigned char)bwt[a]]++;
+    for (int a = 1; a <= length; a++) {
+        tally[(unsigned char)bwt[a-1]]++;
 
         if (a % 1 == 0) {  // CP_INTERVAL = 1
             for (int b = 0; b < ALPHABET_SIZE; b++) {
@@ -135,8 +135,8 @@ int topfunction(char *dna_seq, char *pattern, int positions[])
         unsigned char c = pattern[d];
         int x = checkpoints[c][l / 1];
         int y = checkpoints[c][r / 1];
-        l = first[c] + (x ? x - 1 : 0);
-        r = first[c] + (y ? y - 1 : 0);
+        l = first[c] + (x ? x  : 0);
+        r = first[c] + (y ? y  : 0);
 //		#pragma HLS PIPELINE II=1
         if (r < l) 
         {
@@ -151,11 +151,11 @@ int topfunction(char *dna_seq, char *pattern, int positions[])
         printf("Pattern not found.\n");
         return 0;
     }
-    int occurrences = r - l + 1;  // Calculate the number of occurrences
+    int occurrences = r - l ;  // Calculate the number of occurrences
     printf("Pattern found at positions: ");
     int count = 0;
 
-    for (int p = l; p <= r && count < MAX_OCCURRENCES; p++) {
+    for (int p = l; p < r && count < MAX_OCCURRENCES; p++) {
         positions[count++] = suffix_array[p];
         printf("%d ", suffix_array[p]);
     }
